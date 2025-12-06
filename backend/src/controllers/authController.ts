@@ -1,11 +1,14 @@
 import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { User } from '../models/User';
 
 const generateToken = (id: string): string => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'fallback_secret', {
-    expiresIn: process.env.JWT_EXPIRE || '7d'
-  });
+  const secret = process.env.JWT_SECRET || 'fallback_secret';
+  const expiresIn = process.env.JWT_EXPIRE || '7d';
+  
+  return jwt.sign({ id }, secret, {
+    expiresIn
+  } as SignOptions);
 };
 
 // @desc    Register new user

@@ -192,7 +192,7 @@ npx ts-node scripts/createAdmin.ts
 ```bash
 curl -X POST http://localhost:5000/api/auth/admin/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"admin@bubblycrochet.com","password":"admin123"}'
+  -d '{"email":"kerrinankhoma@gmail.com","password":"admin123"}'
 ```
 
 **Expected Response:**
