@@ -1,6 +1,6 @@
 import React from 'react';
 import { Instagram, Youtube } from 'lucide-react';
-import { AdminSettings } from '../../types';
+import { AdminSettings } from '../../types/types';
 
 interface FooterProps {
   settings: AdminSettings;
@@ -27,8 +27,10 @@ export const Footer: React.FC<FooterProps> = ({ settings }) => (
           )}
           {settings.tiktokUrl && (
             <a href={settings.tiktokUrl} target="_blank" rel="noopener noreferrer" className="bg-white/10 p-2 rounded-full hover:bg-white/20 transition">
-              {/* TikTok Icon Placeholder (Letter T in circle style) */}
-              <div className="w-5 h-5 flex items-center justify-center font-bold text-white text-xs">T</div>
+              {/* TikTok Icon (Custom SVG) */}
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-white">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+              </svg>
             </a>
           )}
           {settings.youtubeUrl && (

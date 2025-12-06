@@ -1,6 +1,6 @@
-import React from 'react';
-import { Plus, Edit2, Trash2, Save, ImageIcon } from 'lucide-react';
-import { Product } from '../../types';
+import React, { useState } from 'react';
+import { Plus, Edit2, Trash2, Save, ImageIcon, Upload, X } from 'lucide-react';
+import { Product } from '../../types/types';
 
 interface ProductsManagementProps {
   products: Product[];
@@ -16,7 +16,53 @@ export const ProductsManagement: React.FC<ProductsManagementProps> = ({
   setEditingProduct,
   handleDelete,
   handleSaveProduct
-}) => (
+}) => {
+  const [imagePreview, setImagePreview] = useState<string>('');
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleImageDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImagePreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImagePreview(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  React.useEffect(() => {
+    if (editingProduct?.images[0]) {
+      setImagePreview(editingProduct.images[0]);
+    } else {
+      setImagePreview('');
+    }
+  }, [editingProduct]);
+
+  return (
   <div className="space-y-6">
     <div className="flex justify-between items-center">
       <h2 className="text-2xl font-bold text-purple-900">Product Management</h2>
@@ -44,6 +90,9 @@ export const ProductsManagement: React.FC<ProductsManagementProps> = ({
                 <option>Toys</option>
                 <option>Apparel</option>
                 <option>Accessories</option>
+                <option>Home Decor</option>
+                <option>Seasonal Items</option>
+                <option>Custom Orders</option>
               </select>
             </div>
             <div>
@@ -68,11 +117,48 @@ export const ProductsManagement: React.FC<ProductsManagementProps> = ({
             <textarea name="description" defaultValue={editingProduct.description} rows={3} className="w-full mt-1 p-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none text-gray-900"></textarea>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Image URL</label>
-            <div className="flex space-x-2">
-              <input name="imageUrl" defaultValue={editingProduct.images[0]} className="w-full mt-1 p-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none text-gray-900" placeholder="https://..." />
-              <button type="button" className="mt-1 p-2 bg-gray-100 rounded-lg text-gray-600"><ImageIcon size={20}/></button>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Product Image</label>
+            <div
+              onDrop={handleImageDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              className={`relative border-2 border-dashed rounded-lg p-6 transition ${
+                isDragging ? 'border-purple-500 bg-purple-50' : 'border-gray-300 bg-gray-50'
+              }`}
+            >
+              {imagePreview ? (
+                <div className="relative">
+                  <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg" />
+                  <button
+                    type="button"
+                    onClick={() => setImagePreview('')}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                  >
+                    <X size={16} />
+                  </button>
+                  <input type="hidden" name="imageUrl" value={imagePreview} />
+                </div>
+              ) : (
+                <div className="text-center">
+                  <Upload size={48} className="mx-auto text-gray-400 mb-3" />
+                  <p className="text-gray-600 mb-2">Drag and drop an image here</p>
+                  <p className="text-gray-400 text-sm mb-3">or</p>
+                  <label className="cursor-pointer">
+                    <span className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition inline-block">
+                      Browse Files
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="hidden"
+                    />
+                  </label>
+                  <input type="hidden" name="imageUrl" value="" />
+                </div>
+              )}
             </div>
+            <p className="text-xs text-gray-500 mt-2">Supports: JPG, PNG, GIF (Max 5MB)</p>
           </div>
           <div className="flex justify-end space-x-3 pt-4 border-t border-purple-50">
             <button type="button" onClick={() => setEditingProduct(null)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">Cancel</button>
@@ -116,3 +202,4 @@ export const ProductsManagement: React.FC<ProductsManagementProps> = ({
     </div>
   </div>
 );
+};

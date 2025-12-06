@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertCircle } from 'lucide-react';
 import { YarnLogo } from '../Visuals';
-import { ViewState } from '../../types';
+import { ViewState } from '../../types/types';
 
 interface AuthModalProps {
   showAuthModal: boolean;

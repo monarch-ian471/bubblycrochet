@@ -103,3 +103,69 @@ export const getMe = async (req: Request, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// @desc    Admin login
+// @route   POST /api/auth/admin/login
+// @access  Public
+export const adminLogin = async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check for admin user
+    const user = await User.findOne({ email, role: 'admin' }).select('+password');
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid admin credentials' });
+    }
+
+    // Check password
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid admin credentials' });
+    }
+
+    const token = generateToken(user._id.toString());
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        role: user.role
+      }
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Delete user account
+// @route   DELETE /api/auth/account
+// @access  Private
+export const deleteAccount = async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user.id;
+    
+    // Prevent admin deletion via this endpoint
+    const user = await User.findById(userId);
+    if (user?.role === 'admin') {
+      return res.status(403).json({ message: 'Admin accounts cannot be deleted via this endpoint' });
+    }
+
+    // Delete user and all associated data
+    await User.findByIdAndDelete(userId);
+    
+    // TODO: Also delete user's orders, reviews, notifications
+    // await Order.deleteMany({ userId });
+    // await Review.deleteMany({ userId });
+    // await Notification.deleteMany({ recipientId: user?.email });
+
+    res.json({ 
+      success: true, 
+      message: 'Account deleted successfully' 
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};

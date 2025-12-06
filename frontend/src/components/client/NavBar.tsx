@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Search, ShoppingBag, User, Bell } from 'lucide-react';
-import { YarnLogo } from '../Visuals';
-import { AdminSettings, Notification, ViewState } from '../../types';
+import { AdminLogo, YarnLogo } from '../Visuals';
+import { AdminSettings, Notification, ViewState } from '../../types/types';
 
 interface NavBarProps {
   settings: AdminSettings;
@@ -31,11 +31,36 @@ export const NavBar: React.FC<NavBarProps> = ({
   setIsCartOpen,
   cart,
   handleProfileClick
-}) => (
+}) => {
+  const notificationsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+
+  const handleNotificationsMouseEnter = () => {
+    if (notificationsTimeoutRef.current) {
+      clearTimeout(notificationsTimeoutRef.current);
+      notificationsTimeoutRef.current = null;
+    }
+  };
+
+  const handleNotificationsMouseLeave = () => {
+    notificationsTimeoutRef.current = setTimeout(() => {
+      setIsNotificationsOpen(false);
+    }, 300);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (notificationsTimeoutRef.current) {
+        clearTimeout(notificationsTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  return (
   <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-pink-100">
     <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
       <div className="flex items-center gap-3 cursor-pointer" onClick={() => setView(ViewState.LANDING)}>
-        <YarnLogo size="sm" />
+        <AdminLogo size="sm" />
         <span className="text-2xl font-bold text-purple-900 tracking-tight">{settings.storeName}</span>
       </div>
 
@@ -56,7 +81,12 @@ export const NavBar: React.FC<NavBarProps> = ({
         <div className="flex items-center gap-4 border-l border-pink-200 pl-6 relative">
           {/* Notifications */}
           {isLoggedIn && (
-            <div className="relative">
+            <div 
+              className="relative" 
+              ref={notificationsRef}
+              onMouseEnter={handleNotificationsMouseEnter}
+              onMouseLeave={handleNotificationsMouseLeave}
+            >
               <button onClick={() => setIsNotificationsOpen(!isNotificationsOpen)} className="text-purple-900 hover:text-pink-600 transition">
                 <Bell size={24} />
                 {notifications.filter(n => !n.read).length > 0 && <span className="absolute -top-1 -right-1 bg-red-500 w-3 h-3 rounded-full animate-pulse"></span>}
@@ -90,4 +120,5 @@ export const NavBar: React.FC<NavBarProps> = ({
       </div>
     </div>
   </nav>
-);
+  );
+};

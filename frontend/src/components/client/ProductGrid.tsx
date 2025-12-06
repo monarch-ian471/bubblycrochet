@@ -1,15 +1,17 @@
 import React from 'react';
-import { ShoppingBag, Clock } from 'lucide-react';
-import { Product } from '../../types';
+import { ShoppingBag, Clock, Lock } from 'lucide-react';
+import { Product } from '../../types/types';
 
 interface ProductGridProps {
   products: Product[];
   onProductClick: (product: Product) => void;
   addToCart: (product: Product) => void;
   setIsCartOpen: (open: boolean) => void;
+  isPreviewMode?: boolean;
+  onLoginPrompt?: () => void;
 }
 
-export const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductClick, addToCart, setIsCartOpen }) => (
+export const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductClick, addToCart, setIsCartOpen, isPreviewMode = false, onLoginPrompt }) => (
   <div className="max-w-7xl mx-auto px-4 py-12">
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
       {products.map((product) => (
@@ -23,18 +25,27 @@ export const ProductGrid: React.FC<ProductGridProps> = ({ products, onProductCli
           <div className="p-6">
             <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-purple-700 transition">{product.name}</h3>
             <p className="text-gray-500 text-sm line-clamp-2 mb-4">{product.description}</p>
-            <div className="flex justify-between items-center">
-              <div>
-                <span className="text-2xl font-bold text-purple-900">${product.price}</span>
-                <div className="flex items-center text-xs text-gray-400 mt-1 gap-1"><Clock size={12}/> {product.daysToMake}d make time</div>
+            {!isPreviewMode && (
+              <div className="flex justify-between items-center">
+                <div>
+                  {product.discount && product.discount > 0 ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-lg font-semibold text-gray-400 line-through">${product.price.toFixed(2)}</span>
+                      <span className="text-2xl font-bold text-purple-900">${(product.price * (1 - product.discount / 100)).toFixed(2)}</span>
+                    </div>
+                  ) : (
+                    <span className="text-2xl font-bold text-purple-900">${product.price.toFixed(2)}</span>
+                  )}
+                  <div className="flex items-center text-xs text-gray-400 mt-1 gap-1"><Clock size={12}/> {product.daysToMake}d make time</div>
+                </div>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); addToCart(product); setIsCartOpen(true); }}
+                  className="bg-pink-100 text-pink-600 p-3 rounded-full hover:bg-pink-500 hover:text-white transition"
+                >
+                  <ShoppingBag size={20} />
+                </button>
               </div>
-              <button 
-                onClick={(e) => { e.stopPropagation(); addToCart(product); setIsCartOpen(true); }}
-                className="bg-pink-100 text-pink-600 p-3 rounded-full hover:bg-pink-500 hover:text-white transition"
-              >
-                <ShoppingBag size={20} />
-              </button>
-            </div>
+            )}
           </div>
         </div>
       ))}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ArrowLeft, ShoppingBag, Clock, Truck, Star } from 'lucide-react';
-import { Product, Review, ViewState } from '../../types';
+import { Product, Review, ViewState } from '../../types/types';
 
 interface ProductDetailProps {
   product: Product | null;
@@ -52,8 +52,15 @@ export const ProductDetail: React.FC<ProductDetailProps> = ({
             <span className="text-pink-500 font-bold tracking-wider text-sm uppercase">{product.category}</span>
             <h1 className="text-4xl font-bold text-purple-900 mt-2">{product.name}</h1>
             <div className="flex items-center mt-4 space-x-4">
-              <span className="text-3xl font-bold text-gray-800">${product.price}</span>
-              {product.discount && <span className="text-xl text-gray-400 line-through">${(product.price * (1 + product.discount/100)).toFixed(2)}</span>}
+              {product.discount && product.discount > 0 ? (
+                <>
+                  <span className="text-2xl text-gray-400 line-through">${product.price.toFixed(2)}</span>
+                  <span className="text-3xl font-bold text-purple-900">${(product.price * (1 - product.discount / 100)).toFixed(2)}</span>
+                  <span className="bg-pink-500 text-white px-3 py-1 rounded-full text-sm font-bold">-{product.discount}% OFF</span>
+                </>
+              ) : (
+                <span className="text-3xl font-bold text-gray-800">${product.price.toFixed(2)}</span>
+              )}
             </div>
             <div className="flex gap-4 mt-2 text-sm text-gray-500">
               <span className="flex items-center gap-1"><Clock size={16}/> Ready in ~{product.daysToMake} days</span>

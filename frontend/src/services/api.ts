@@ -1,4 +1,7 @@
-import { Product, Review, AdminSettings, UserProfile, Order, Notification } from '../types';
+import { Product, Review, AdminSettings, UserProfile, Order, Notification } from '../types/types';
+import axios from 'axios';
+
+const API_BASE_URL = 'http://localhost:5000/api';
 
 // --- IN-MEMORY DATABASE (Replace these with MongoDB calls in the future) ---
 let PRODUCTS_DB: Product[] = [
@@ -73,15 +76,15 @@ let REVIEWS_DB: Review[] = [
 ];
 
 let SETTINGS_DB: AdminSettings = {
-  storeName: 'CozyLoops',
-  ownerName: 'Grandma Alice',
-  logoUrl: 'https://picsum.photos/100/100?random=99',
-  ownerAvatar: 'https://picsum.photos/200/200?random=88',
+  storeName: 'Bubbly Crochet',
+  ownerName: 'Kerrina Nkhoma',
+  logoUrl: 'src/assets/bubblycrochetlogo.png',
+  ownerAvatar: 'src/assets/kerrinankhoma.jpeg',
   primaryColor: '#d946ef',
-  copyrightText: '© 2025 CozyLoops. All rights reserved.',
-  contactEmail: 'alice@cozyloops.com',
+  copyrightText: '© 2025 Bubbly Crochet. All rights reserved.',
+  contactEmail: 'kerrinankhoma@gmail.com',
   contactPhone: '+1 (555) 123-4567',
-  shopLocation: 'Portland, OR',
+  shopLocation: 'Seattle, WA',
   instagramUrl: 'https://instagram.com',
   tiktokUrl: 'https://tiktok.com',
   youtubeUrl: ''
@@ -98,17 +101,20 @@ export const api = {
   auth: {
     // Admin Login
     loginAdmin: async (email: string, password: string): Promise<boolean> => {
-      // Future: await axios.post('/api/auth/admin', { email, password });
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          // Simple validation for prototype
-          if (email.toLowerCase() === 'admin@cozyloops.com' && password === 'admin123') {
-            resolve(true);
-          } else {
-            reject(new Error("Invalid credentials. Hint: admin@cozyloops.com / admin123"));
-          }
-        }, 800);
-      });
+      try {
+        const response = await axios.post('http://localhost:5000/api/auth/admin/login', {
+          email,
+          password
+        });
+        
+        if (response.data.success && response.data.token) {
+          localStorage.setItem('adminToken', response.data.token);
+          return true;
+        }
+        return false;
+      } catch (error: any) {
+        throw new Error(error.response?.data?.message || "Invalid admin credentials");
+      }
     },
 
     // Client Validation (Pre-check before sending to DB)
@@ -184,6 +190,28 @@ export const api = {
   addNotification: async (notification: Notification): Promise<Notification> => {
     NOTIFICATIONS_DB.unshift(notification);
     return Promise.resolve(notification);
+  },
+
+  // User Management
+  deleteUser: async (email: string): Promise<void> => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_BASE_URL}/auth/account`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      // Clear local token after successful deletion
+      localStorage.removeItem('token');
+      localStorage.removeItem('currentUser');
+      
+      // Also update local mock data for consistency
+      ORDERS_DB = ORDERS_DB.filter(o => o.userId !== email);
+      NOTIFICATIONS_DB = NOTIFICATIONS_DB.filter(n => n.recipientId !== email);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to delete account');
+    }
   }
 };
 

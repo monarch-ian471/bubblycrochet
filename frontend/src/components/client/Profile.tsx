@@ -1,15 +1,52 @@
-import React from 'react';
-import { Edit2, LogIn } from 'lucide-react';
-import { UserProfile, Notification, ViewState } from '../../types';
+import React, { useState } from 'react';
+import { Edit2, LogIn, X, Trash2, AlertTriangle } from 'lucide-react';
+import { UserProfile, Notification, ViewState } from '../../types/types';
 
 interface ProfileProps {
   currentUser: UserProfile;
   updateUser: (user: UserProfile) => void;
   onNavigate: (view: ViewState) => void;
   notifications: Notification[];
+  onDeleteAccount: () => void;
 }
 
-export const Profile: React.FC<ProfileProps> = ({ currentUser, updateUser, onNavigate, notifications }) => (
+export const Profile: React.FC<ProfileProps> = ({ currentUser, updateUser, onNavigate, notifications, onDeleteAccount }) => {
+  const [newInterest, setNewInterest] = useState('');
+  const [showInterestInput, setShowInterestInput] = useState(false);
+  const [bio, setBio] = useState(currentUser.bio);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  const saveBio = () => {
+    updateUser({...currentUser, bio});
+  };
+
+  const addInterest = () => {
+    if (newInterest.trim() && !currentUser.interests.includes(newInterest.trim())) {
+      const updatedUser = {
+        ...currentUser,
+        interests: [...currentUser.interests, newInterest.trim()]
+      };
+      updateUser(updatedUser);
+      setNewInterest('');
+      setShowInterestInput(false);
+    }
+  };
+
+  const removeInterest = (interestToRemove: string) => {
+    const updatedUser = {
+      ...currentUser,
+      interests: currentUser.interests.filter(interest => interest !== interestToRemove)
+    };
+    updateUser(updatedUser);
+  };
+
+  const handleDeleteAccount = () => {
+    onDeleteAccount();
+    setShowDeleteConfirm(false);
+  };
+
+  return (
+  <>
   <div className="max-w-4xl mx-auto px-4 py-12">
     <div className="bg-white rounded-3xl p-8 shadow-sm border border-pink-100 flex flex-col md:flex-row gap-8 items-start">
       <div className="flex flex-col items-center gap-4 w-full md:w-1/3">
@@ -52,17 +89,67 @@ export const Profile: React.FC<ProfileProps> = ({ currentUser, updateUser, onNav
           <h3 className="font-bold text-gray-800 mb-2">Bio</h3>
           <textarea 
             className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-purple-200 text-gray-900" 
-            defaultValue={currentUser.bio}
-            onBlur={(e) => updateUser({...currentUser, bio: e.target.value})}
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+            placeholder="Tell us about yourself..."
+            rows={4}
           />
+          <button 
+            onClick={saveBio}
+            className="mt-2 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition font-semibold"
+          >
+            Save Bio
+          </button>
         </div>
         <div>
           <h3 className="font-bold text-gray-800 mb-2">Interests</h3>
           <div className="flex flex-wrap gap-2">
             {currentUser.interests.map((tag, i) => (
-              <span key={i} className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm">{tag}</span>
+              <span key={i} className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-sm flex items-center gap-2">
+                {tag}
+                <button 
+                  onClick={() => removeInterest(tag)}
+                  className="hover:bg-purple-200 rounded-full p-0.5"
+                >
+                  <X size={14} />
+                </button>
+              </span>
             ))}
-            <button className="text-purple-600 text-sm font-semibold hover:bg-purple-50 px-3 py-1 rounded-full transition">+ Add Interest</button>
+            {showInterestInput ? (
+              <div className="flex items-center gap-2">
+                <input 
+                  type="text"
+                  value={newInterest}
+                  onChange={(e) => setNewInterest(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && addInterest()}
+                  placeholder="New interest..."
+                  className="px-3 py-1 rounded-full text-sm border border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-200"
+                  autoFocus
+                />
+                <button 
+                  onClick={addInterest}
+                  className="bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-semibold hover:bg-purple-700 transition"
+                >
+                  Add
+                </button>
+                <button 
+                  onClick={() => {
+                    setShowInterestInput(false);
+                    setNewInterest('');
+                  }}
+                  className="text-gray-500 text-sm font-semibold hover:bg-gray-100 px-3 py-1 rounded-full transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => setShowInterestInput(true)}
+                className="text-purple-600 text-sm font-semibold hover:bg-purple-50 px-3 py-1 rounded-full transition"
+              >
+                + Add Interest
+              </button>
+            )}
           </div>
         </div>
         <div className="bg-blue-50 p-6 rounded-xl">
@@ -74,10 +161,65 @@ export const Profile: React.FC<ProfileProps> = ({ currentUser, updateUser, onNav
               ))}
             </div>
           ) : (
-            <p className="text-blue-600 text-sm">No recent orders found. Time to shop!</p>
+            <p className="text-blue-600 text-sm">No recent orders found. Time to browse our collection!</p>
           )}
+        </div>
+        
+        {/* Delete Account Section */}
+        <div className="bg-red-50 p-6 rounded-xl border border-red-200">
+          <h3 className="font-bold text-red-800 mb-2">Delete Account</h3>
+          <p className="text-red-600 text-sm mb-4">
+            Permanently delete your account and all associated data. This action cannot be undone.
+          </p>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition font-semibold"
+          >
+            <Trash2 size={16} />
+            Delete My Account
+          </button>
         </div>
       </div>
     </div>
+    
+    {/* Delete Confirmation Modal */}
+    {showDeleteConfirm && (
+      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl">
+          <div className="flex items-center gap-3 mb-4">
+            <AlertTriangle size={32} className="text-red-600" />
+            <h3 className="text-2xl font-bold text-gray-900">Delete Account?</h3>
+          </div>
+          <p className="text-gray-600 mb-6">
+            Are you absolutely sure you want to delete your account? This will permanently remove:
+          </p>
+          <ul className="list-disc list-inside text-gray-600 mb-6 space-y-1">
+            <li>Your profile information</li>
+            <li>Order history</li>
+            <li>Saved preferences</li>
+            <li>All personal data</li>
+          </ul>
+          <p className="text-red-600 font-semibold mb-6">
+            This action cannot be undone.
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowDeleteConfirm(false)}
+              className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition font-semibold"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleDeleteAccount}
+              className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition font-semibold"
+            >
+              Yes, Delete Account
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
   </div>
+  </>
 );
+};

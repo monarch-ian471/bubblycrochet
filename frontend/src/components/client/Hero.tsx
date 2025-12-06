@@ -1,6 +1,6 @@
 import React from 'react';
 import { FadeIn } from '../Visuals';
-import { ViewState } from '../../types';
+import { ViewState } from '../../types/types';
 
 interface HeroProps {
   setView: (view: ViewState) => void;

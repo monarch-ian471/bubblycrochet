@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Product, CartItem, UserProfile, ViewState, Review, AdminSettings, Notification } from '../../types';
+import { Product, CartItem, UserProfile, ViewState, Review, AdminSettings, Notification } from '../types/types';
 import { api } from '../services/api';
 import { NavBar } from './client/NavBar';
 import { Footer } from './client/Footer';
@@ -11,6 +11,7 @@ import { CartDrawer } from './client/CartDrawer';
 import { CheckoutModal } from './client/CheckoutModal';
 import { AuthModal } from './client/AuthModal';
 import { OrderConfirmation } from './client/OrderConfirmation';
+import { Lock } from 'lucide-react';
 
 interface ClientViewProps {
   products: Product[];
@@ -26,10 +27,11 @@ interface ClientViewProps {
   onLogin: (email: string, name?: string, address?: string, phone?: string) => void;
   onPlaceOrder: (items: CartItem[], specialRequest: string) => void;
   onSubmitReview: (productId: string, comment: string, rating: number) => void;
+  onDeleteAccount: () => void;
 }
 
 export const ClientView: React.FC<ClientViewProps> = ({ 
-    products, reviews, settings, currentUser, cart, addToCart, updateUser, onNavigate, notifications, isLoggedIn, onLogin, onPlaceOrder, onSubmitReview
+    products, reviews, settings, currentUser, cart, addToCart, updateUser, onNavigate, notifications, isLoggedIn, onLogin, onPlaceOrder, onSubmitReview, onDeleteAccount
 }) => {
   const [view, setView] = useState<ViewState>(ViewState.LANDING);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -154,12 +156,25 @@ export const ClientView: React.FC<ClientViewProps> = ({
           <>
             <Hero setView={setView} />
             <div className="py-8">
-              <h2 className="text-3xl font-bold text-center text-purple-900 mb-8">Featured Warmth</h2>
+              <h2 className="text-3xl font-bold text-center text-purple-900 mb-8">
+                {isLoggedIn ? 'Featured Warmth' : 'Preview Our Collection'}
+              </h2>
+              {!isLoggedIn && (
+                <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
+                  Login to view prices, add items to your cart, and explore our full collection of handmade crochet items.
+                </p>
+              )}
               <ProductGrid 
-                products={filteredProducts}
-                onProductClick={openProduct}
+                products={isLoggedIn ? filteredProducts : filteredProducts.slice(0, 3)}
+                onProductClick={isLoggedIn ? openProduct : () => {}}
                 addToCart={addToCart}
                 setIsCartOpen={setIsCartOpen}
+                isPreviewMode={!isLoggedIn}
+                onLoginPrompt={() => {
+                  setAuthMode('LOGIN');
+                  setAuthError(null);
+                  setShowAuthModal(true);
+                }}
               />
             </div>
           </>
@@ -167,13 +182,35 @@ export const ClientView: React.FC<ClientViewProps> = ({
 
         {view === ViewState.SHOP && (
           <div className="py-8">
-            <h2 className="text-3xl font-bold text-center text-purple-900 mb-4">Shop All</h2>
-            <ProductGrid 
-              products={filteredProducts}
-              onProductClick={openProduct}
-              addToCart={addToCart}
-              setIsCartOpen={setIsCartOpen}
-            />
+            {isLoggedIn ? (
+              <>
+                <h2 className="text-3xl font-bold text-center text-purple-900 mb-4">Browse Collection</h2>
+                <ProductGrid 
+                  products={filteredProducts}
+                  onProductClick={openProduct}
+                  addToCart={addToCart}
+                  setIsCartOpen={setIsCartOpen}
+                />
+              </>
+            ) : (
+              <div className="max-w-2xl mx-auto px-4 py-20 text-center">
+                <Lock size={64} className="mx-auto text-purple-600 mb-6" />
+                <h2 className="text-3xl font-bold text-purple-900 mb-4">Login Required</h2>
+                <p className="text-gray-600 mb-8">
+                  Please login or create an account to browse our full collection and start shopping.
+                </p>
+                <button
+                  onClick={() => {
+                    setAuthMode('LOGIN');
+                    setAuthError(null);
+                    setShowAuthModal(true);
+                  }}
+                  className="bg-purple-600 text-white px-8 py-3 rounded-full hover:bg-purple-700 transition font-semibold"
+                >
+                  Login / Sign Up
+                </button>
+              </div>
+            )}
           </div>
         )}
 
@@ -208,6 +245,7 @@ export const ClientView: React.FC<ClientViewProps> = ({
             updateUser={updateUser}
             onNavigate={onNavigate}
             notifications={notifications}
+            onDeleteAccount={onDeleteAccount}
           />
         )}
       </div>

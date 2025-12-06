@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, User, Send, Clock } from 'lucide-react';
-import { CartItem, UserProfile, AdminSettings } from '../../types';
+import { CartItem, UserProfile, AdminSettings } from '../../types/types';
 
 interface CheckoutModalProps {
   showCheckout: boolean;

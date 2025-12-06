@@ -1,6 +1,6 @@
 import React from 'react';
 import { Clock } from 'lucide-react';
-import { Order } from '../../types';
+import { Order } from '../../types/types';
 
 interface OrdersManagementProps {
   orders: Order[];

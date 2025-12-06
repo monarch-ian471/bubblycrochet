@@ -1,6 +1,6 @@
 import React from 'react';
 import { CheckCircle } from 'lucide-react';
-import { ViewState } from '../../types';
+import { ViewState } from '../../types/types';
 
 interface OrderConfirmationProps {
   setView: (view: ViewState) => void;
@@ -19,7 +19,7 @@ export const OrderConfirmation: React.FC<OrderConfirmationProps> = ({ setView, o
     </p>
     <div className="flex gap-4">
       <button onClick={() => setView(ViewState.SHOP)} className="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-purple-700 transition">
-        Continue Shopping
+        Continue Browsing
       </button>
       <button onClick={() => setView(ViewState.PROFILE)} className="bg-white border border-purple-200 text-purple-700 px-6 py-3 rounded-full font-semibold hover:bg-purple-50 transition">
         View Order Status

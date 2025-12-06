@@ -1,4 +1,4 @@
-import { Product, Review, AdminSettings, UserProfile, Order, Notification } from '../types';
+import { Product, Review, AdminSettings, UserProfile, Order, Notification } from '../types/types';
 
 // --- IN-MEMORY DATABASE (Replace these with MongoDB calls in the future) ---
 let PRODUCTS_DB: Product[] = [

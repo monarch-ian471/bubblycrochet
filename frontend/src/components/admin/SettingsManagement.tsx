@@ -1,13 +1,36 @@
-import React from 'react';
-import { Edit2, Instagram, Youtube } from 'lucide-react';
-import { AdminSettings } from '../../types';
+import React, { useState } from 'react';
+import { Edit2, Instagram, Youtube, Check } from 'lucide-react';
+import { AdminSettings } from '../../types/types';
 
 interface SettingsManagementProps {
   settings: AdminSettings;
   setSettings: (settings: AdminSettings) => void;
+  onSave?: () => void;
 }
 
-export const SettingsManagement: React.FC<SettingsManagementProps> = ({ settings, setSettings }) => (
+export const SettingsManagement: React.FC<SettingsManagementProps> = ({ settings, setSettings, onSave }) => {
+  const [showToast, setShowToast] = useState(false);
+
+  const handleSaveChanges = () => {
+    // Show toast notification
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+    
+    // Call parent's save handler if provided
+    if (onSave) {
+      onSave();
+    }
+  };
+
+  return (
+  <>
+    {showToast && (
+      <div className="fixed top-4 right-4 bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-fade-in z-50">
+        <Check size={24} />
+        <span className="font-semibold">Settings saved successfully!</span>
+      </div>
+    )}
+  
   <div className="max-w-2xl mx-auto space-y-6">
     <h2 className="text-2xl font-bold text-purple-900">Store Settings</h2>
     <div className="bg-white p-8 rounded-xl shadow-sm border border-pink-100 space-y-6">
@@ -50,7 +73,7 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ settings
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Shop Location / Address</label>
+          <label className="block text-sm font-medium text-gray-700">Studio Location / Address</label>
           <input value={settings.shopLocation} onChange={(e) => setSettings({...settings, shopLocation: e.target.value})} className="w-full mt-1 p-3 border border-purple-200 rounded-lg text-gray-900" />
         </div>
         
@@ -78,8 +101,15 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ settings
           <label className="block text-sm font-medium text-gray-700 mt-4">Copyright Text</label>
           <input value={settings.copyrightText} onChange={(e) => setSettings({...settings, copyrightText: e.target.value})} className="w-full mt-1 p-3 border border-purple-200 rounded-lg text-gray-900" />
         </div>
-        <button className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold shadow-lg shadow-purple-200 transition">Save Changes</button>
+        <button 
+          onClick={handleSaveChanges}
+          className="w-full py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold shadow-lg shadow-purple-200 transition"
+        >
+          Save Changes
+        </button>
       </div>
     </div>
   </div>
+  </>
 );
+};

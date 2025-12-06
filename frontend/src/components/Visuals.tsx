@@ -1,19 +1,20 @@
 import React, { useEffect, useRef } from 'react';
 import * as d3 from 'd3';
+import logoImage from '../assets/bubblycrochetlogo.png';
 
-// --- Yarn Logo Animation ---
-export const YarnLogo: React.FC<{ size?: 'sm' | 'lg', animated?: boolean }> = ({ size = 'lg', animated = false }) => {
+// --- Admin Logo ---
+export const AdminLogo: React.FC<{ size?: 'sm' | 'lg', animated?: boolean }> = ({ size = 'lg', animated = false }) => {
   const dim = size === 'lg' ? 80 : 40;
   
   return (
     <div className={`relative flex items-center justify-center ${animated ? 'animate-bounce-slow' : ''}`}>
-      <svg width={dim} height={dim} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="50" cy="50" r="45" fill="#fce7f3" />
-        <path d="M50 10C35 10 20 25 20 50C20 75 35 90 50 90C65 90 80 75 80 50" stroke="#d946ef" strokeWidth="6" strokeLinecap="round"/>
-        <path d="M50 10C65 10 80 25 80 50C80 75 65 90 50 90" stroke="#a21caf" strokeWidth="6" strokeLinecap="round" strokeDasharray="10 10"/>
-        <path d="M25 35L75 65" stroke="#7e22ce" strokeWidth="4" strokeLinecap="round"/>
-        <path d="M75 35L25 65" stroke="#7e22ce" strokeWidth="4" strokeLinecap="round"/>
-      </svg>
+      <img 
+        src={logoImage} 
+        alt="Bubbly Crochet Logo" 
+        width={dim} 
+        height={dim}
+        className="rounded-full object-cover"
+      />
       {animated && (
         <div className="absolute -right-2 -bottom-2">
             <div className="w-4 h-4 bg-purple-500 rounded-full animate-ping"></div>
@@ -22,6 +23,9 @@ export const YarnLogo: React.FC<{ size?: 'sm' | 'lg', animated?: boolean }> = ({
     </div>
   );
 };
+
+// Keep YarnLogo as alias for backwards compatibility
+export const YarnLogo = AdminLogo;
 
 // --- D3 Matrix Visualization ---
 interface MatrixProps {
