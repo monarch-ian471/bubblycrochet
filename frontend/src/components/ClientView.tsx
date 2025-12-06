@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Product, CartItem, UserProfile, ViewState, Review, AdminSettings, Notification } from '../types';
+import { Product, CartItem, UserProfile, ViewState, Review, AdminSettings, Notification } from '../../types';
 import { api } from '../services/api';
 import { NavBar } from './client/NavBar';
 import { Footer } from './client/Footer';
