@@ -76,11 +76,67 @@ export const Profile: React.FC<ProfileProps> = ({ currentUser, updateUser, onNav
             />
           </div>
           <div>
+            <h3 className="font-bold text-gray-800 mb-2">Country</h3>
+            <select
+              className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-purple-200 text-gray-900"
+              defaultValue={currentUser.country}
+              onChange={(e) => updateUser({...currentUser, country: e.target.value})}
+            >
+              <option value="">Select Country</option>
+              <option value="United States">United States</option>
+              <option value="Canada">Canada</option>
+              <option value="United Kingdom">United Kingdom</option>
+              <option value="Australia">Australia</option>
+              <option value="Germany">Germany</option>
+              <option value="France">France</option>
+              <option value="Italy">Italy</option>
+              <option value="Spain">Spain</option>
+              <option value="Netherlands">Netherlands</option>
+              <option value="Belgium">Belgium</option>
+              <option value="Switzerland">Switzerland</option>
+              <option value="Austria">Austria</option>
+              <option value="Ireland">Ireland</option>
+              <option value="New Zealand">New Zealand</option>
+              <option value="Singapore">Singapore</option>
+              <option value="Japan">Japan</option>
+              <option value="South Korea">South Korea</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 className="font-bold text-gray-800 mb-2">Country Code</h3>
+            <select
+              className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-purple-200 text-gray-900"
+              defaultValue={currentUser.countryCode}
+              onChange={(e) => updateUser({...currentUser, countryCode: e.target.value})}
+            >
+              <option value="">Select Code</option>
+              <option value="+1">+1 (US/CA)</option>
+              <option value="+44">+44 (UK)</option>
+              <option value="+61">+61 (AU)</option>
+              <option value="+49">+49 (DE)</option>
+              <option value="+33">+33 (FR)</option>
+              <option value="+39">+39 (IT)</option>
+              <option value="+34">+34 (ES)</option>
+              <option value="+31">+31 (NL)</option>
+              <option value="+32">+32 (BE)</option>
+              <option value="+41">+41 (CH)</option>
+              <option value="+43">+43 (AT)</option>
+              <option value="+353">+353 (IE)</option>
+              <option value="+64">+64 (NZ)</option>
+              <option value="+65">+65 (SG)</option>
+              <option value="+81">+81 (JP)</option>
+              <option value="+82">+82 (KR)</option>
+            </select>
+          </div>
+          <div>
             <h3 className="font-bold text-gray-800 mb-2">Phone</h3>
             <input 
               className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-purple-200 text-gray-900" 
               defaultValue={currentUser.phone}
-              placeholder="+1 (555) 000-0000"
+              placeholder="5550000000"
               onBlur={(e) => updateUser({...currentUser, phone: e.target.value})}
             />
           </div>

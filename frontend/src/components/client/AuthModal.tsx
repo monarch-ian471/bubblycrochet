@@ -47,7 +47,51 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             <>
               <input name="name" type="text" placeholder="Full Name" required className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900" />
               <input name="address" type="text" placeholder="Full Delivery Address" required className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900" />
-              <input name="phone" type="text" placeholder="Phone Number" className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900" />
+              
+              <select name="country" required className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
+                <option value="">Select Country</option>
+                <option value="United States">United States</option>
+                <option value="Canada">Canada</option>
+                <option value="United Kingdom">United Kingdom</option>
+                <option value="Australia">Australia</option>
+                <option value="Germany">Germany</option>
+                <option value="France">France</option>
+                <option value="Italy">Italy</option>
+                <option value="Spain">Spain</option>
+                <option value="Netherlands">Netherlands</option>
+                <option value="Belgium">Belgium</option>
+                <option value="Switzerland">Switzerland</option>
+                <option value="Austria">Austria</option>
+                <option value="Ireland">Ireland</option>
+                <option value="New Zealand">New Zealand</option>
+                <option value="Singapore">Singapore</option>
+                <option value="Japan">Japan</option>
+                <option value="South Korea">South Korea</option>
+                <option value="Other">Other</option>
+              </select>
+              
+              <div className="flex gap-2">
+                <select name="countryCode" required className="w-32 p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900">
+                  <option value="">Code</option>
+                  <option value="+1">+1 (US/CA)</option>
+                  <option value="+44">+44 (UK)</option>
+                  <option value="+61">+61 (AU)</option>
+                  <option value="+49">+49 (DE)</option>
+                  <option value="+33">+33 (FR)</option>
+                  <option value="+39">+39 (IT)</option>
+                  <option value="+34">+34 (ES)</option>
+                  <option value="+31">+31 (NL)</option>
+                  <option value="+32">+32 (BE)</option>
+                  <option value="+41">+41 (CH)</option>
+                  <option value="+43">+43 (AT)</option>
+                  <option value="+353">+353 (IE)</option>
+                  <option value="+64">+64 (NZ)</option>
+                  <option value="+65">+65 (SG)</option>
+                  <option value="+81">+81 (JP)</option>
+                  <option value="+82">+82 (KR)</option>
+                </select>
+                <input name="phone" type="tel" placeholder="Phone Number" required className="flex-1 p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900" />
+              </div>
             </>
           )}
           <input name="password" type="password" placeholder="Password" required className="w-full p-3 bg-gray-50 border border-gray-200 rounded-lg text-gray-900" />

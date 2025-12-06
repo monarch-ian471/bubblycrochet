@@ -44,7 +44,7 @@ const App: React.FC = () => {
 
   // --- Logic ---
 
-  const handleClientLogin = (email: string, name?: string, address?: string, phone?: string) => {
+  const handleClientLogin = (email: string, name?: string, address?: string, phone?: string, country?: string, countryCode?: string) => {
       // Mock Login/Signup - This would be replaced by api.auth.loginClient in future
       setIsLoggedIn(true);
       setUser({
@@ -52,7 +52,9 @@ const App: React.FC = () => {
           email,
           name: name || email.split('@')[0],
           address: address || user.address,
-          phone: phone || user.phone
+          phone: phone || user.phone,
+          country: country || user.country,
+          countryCode: countryCode || user.countryCode
       });
       // Add a welcome notification if it's new
       const welcomeId = Date.now().toString();

@@ -8,6 +8,8 @@ export interface IUser extends Document {
   role: 'client' | 'admin';
   avatar?: string;
   address?: string;
+  country?: string;
+  countryCode?: string;
   phone?: string;
   bio?: string;
   interests: string[];
@@ -49,6 +51,14 @@ const UserSchema = new Schema<IUser>(
       default: 'https://ui-avatars.com/api/?background=d946ef&color=fff'
     },
     address: {
+      type: String,
+      trim: true
+    },
+    country: {
+      type: String,
+      trim: true
+    },
+    countryCode: {
       type: String,
       trim: true
     },

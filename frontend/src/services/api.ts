@@ -104,7 +104,7 @@ export const api = {
       try {
         const response = await axios.post('http://localhost:5000/api/auth/admin/login', {
           email,
-          password
+          password,
         });
         
         if (response.data.success && response.data.token) {

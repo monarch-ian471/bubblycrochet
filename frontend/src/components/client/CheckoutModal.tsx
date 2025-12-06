@@ -58,8 +58,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <input className="bg-gray-100 p-3 rounded-lg text-gray-600 cursor-not-allowed" value={currentUser.name} disabled />
               <input className="bg-gray-100 p-3 rounded-lg text-gray-600 cursor-not-allowed" value={currentUser.email} disabled />
               <input className="bg-gray-100 p-3 rounded-lg text-gray-600 cursor-not-allowed col-span-2" value={currentUser.address || 'No address provided'} disabled />
+              <input className="bg-gray-100 p-3 rounded-lg text-gray-600 cursor-not-allowed" value={currentUser.country || 'No country provided'} disabled />
+              <input className="bg-gray-100 p-3 rounded-lg text-gray-600 cursor-not-allowed" value={`${currentUser.countryCode || ''} ${currentUser.phone || 'No phone provided'}`} disabled />
             </div>
-            {(!currentUser.address) && <p className="text-xs text-red-500">Please update your address in your profile for delivery!</p>}
+            {(!currentUser.address || !currentUser.country) && <p className="text-xs text-red-500">Please update your address and country in your profile for delivery!</p>}
           </div>
 
           <div className="space-y-4">

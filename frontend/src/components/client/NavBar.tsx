@@ -113,8 +113,9 @@ export const NavBar: React.FC<NavBarProps> = ({
             <ShoppingBag size={24} />
             {cart.length > 0 && <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full font-bold">{cart.length}</span>}
           </button>
-          <button onClick={handleProfileClick} className="text-purple-900 hover:text-pink-600 transition">
+          <button onClick={handleProfileClick} className="flex items-center gap-2 text-purple-900 hover:text-pink-600 transition">
             <User size={24} />
+            {!isLoggedIn && <span className="text-sm font-semibold">Sign In</span>}
           </button>
         </div>
       </div>

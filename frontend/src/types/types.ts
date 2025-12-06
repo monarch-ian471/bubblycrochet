@@ -31,6 +31,8 @@ export interface UserProfile {
   phone?: string;
   city?: string;
   zipCode?: string;
+  country?: string;
+  countryCode?: string;
 }
 
 export interface CartItem extends Product {

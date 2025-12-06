@@ -24,7 +24,7 @@ interface ClientViewProps {
   onNavigate: (view: ViewState) => void;
   notifications: Notification[];
   isLoggedIn: boolean;
-  onLogin: (email: string, name?: string, address?: string, phone?: string) => void;
+  onLogin: (email: string, name?: string, address?: string, phone?: string, country?: string, countryCode?: string) => void;
   onPlaceOrder: (items: CartItem[], specialRequest: string) => void;
   onSubmitReview: (productId: string, comment: string, rating: number) => void;
   onDeleteAccount: () => void;
@@ -85,6 +85,8 @@ export const ClientView: React.FC<ClientViewProps> = ({
       const name = formData.get('name') as string;
       const address = formData.get('address') as string;
       const phone = formData.get('phone') as string;
+      const country = formData.get('country') as string;
+      const countryCode = formData.get('countryCode') as string;
 
       // Validate Input using API utility
       const validationError = api.auth.validateClientPayload(email, password);
@@ -93,8 +95,18 @@ export const ClientView: React.FC<ClientViewProps> = ({
           return;
       }
 
-      // If valid, proceed to login (In a real app, we would await api.auth.loginClient(email, password))
-      onLogin(email, name, address, phone);
+      // If signup mode, switch to login mode instead of logging in directly
+      if (authMode === 'SIGNUP') {
+          // Show success message and switch to login
+          setAuthMode('LOGIN');
+          setAuthError(null);
+          // In production, this would create the account via API
+          // For now, just prompt them to login with the account they "created"
+          return;
+      }
+
+      // If login mode, proceed to login
+      onLogin(email, name, address, phone, country, countryCode);
       setShowAuthModal(false);
   };
 
