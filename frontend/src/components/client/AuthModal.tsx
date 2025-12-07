@@ -276,6 +276,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     
     handleAuthSubmit(e);
   };
+
+  // Check if authError is a success message (starts with checkmark)
+  const isSuccessMessage = authError?.startsWith('\u2713');
   
   return (
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
@@ -292,7 +295,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           {authError && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-lg flex items-center text-sm">
+            <div className={`p-3 rounded-lg flex items-center text-sm ${ 
+              isSuccessMessage ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'
+            }`}>
               <AlertCircle size={16} className="mr-2 flex-shrink-0" />
               {authError}
             </div>
@@ -383,6 +388,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {authMode === 'LOGIN' ? 'Log In' : 'Create Account'}
           </button>
         </form>
+        
+        {authMode === 'LOGIN' && (
+          <div className="mt-4 text-center">
+            <button 
+              onClick={() => setAuthError('Password reset feature coming soon! Contact support for assistance.')}
+              className="text-sm text-gray-500 hover:text-purple-600 transition"
+            >
+              Forgot password?
+            </button>
+          </div>
+        )}
+        
         <div className="mt-6 text-center">
           <button 
             onClick={() => { 

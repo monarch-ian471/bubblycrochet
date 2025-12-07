@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ViewState, Product, UserProfile, CartItem, AdminSettings, Order, Notification, Review } from './src/types/types';
+import { ViewState, Product, UserProfile, CartItem, AdminSettings, Order, Notification, Review, JourneySection } from './src/types/types';
 import { api, INITIAL_USER } from './src/services/api';
 import { AdminView } from './src/components/AdminView';
 import { ClientView } from './src/components/ClientView';
@@ -17,11 +17,41 @@ const App: React.FC = () => {
   // Simulated Database State
   const [orders, setOrders] = useState<Order[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [journeyData, setJourneyData] = useState<JourneySection>({
+    styles: [],
+    tools: [],
+    resources: [],
+    stores: []
+  });
 
   // User State
-  const [user, setUser] = useState<UserProfile>(INITIAL_USER);
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<UserProfile>(() => {
+    const savedUser = localStorage.getItem('bubblycrochet_user');
+    return savedUser ? JSON.parse(savedUser) : INITIAL_USER;
+  });
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    const savedCart = localStorage.getItem('bubblycrochet_cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    const savedLoginState = localStorage.getItem('bubblycrochet_isLoggedIn');
+    return savedLoginState === 'true';
+  });
+
+  // Save user to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('bubblycrochet_user', JSON.stringify(user));
+  }, [user]);
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('bubblycrochet_cart', JSON.stringify(cart));
+  }, [cart]);
+
+  // Save login state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('bubblycrochet_isLoggedIn', String(isLoggedIn));
+  }, [isLoggedIn]);
 
   // --- Initial Data Load ---
   useEffect(() => {
@@ -67,6 +97,12 @@ const App: React.FC = () => {
           date: Date.now()
       };
       api.addNotification(notif).then(n => setNotifications(prev => [n, ...prev]));
+  };
+
+  const handleClientLogout = () => {
+      setIsLoggedIn(false);
+      setUser(INITIAL_USER);
+      // Cart is preserved - it stays in localStorage
   };
 
   const handleAddToCart = (product: Product) => {
@@ -212,9 +248,11 @@ const App: React.FC = () => {
       notifications={notifications.filter(n => n.recipientId === user.email)}
       isLoggedIn={isLoggedIn}
       onLogin={handleClientLogin}
+      onLogout={handleClientLogout}
       onPlaceOrder={handlePlaceOrder}
       onSubmitReview={handleSubmitReview}
       onDeleteAccount={handleDeleteAccount}
+      journeyData={journeyData}
     />
   );
 };

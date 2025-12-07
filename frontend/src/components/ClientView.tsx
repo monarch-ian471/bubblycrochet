@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Product, CartItem, UserProfile, ViewState, Review, AdminSettings, Notification } from '../types/types';
+import { Product, CartItem, UserProfile, ViewState, Review, AdminSettings, Notification, JourneySection } from '../types/types';
 import { api } from '../services/api';
 import { NavBar } from './client/NavBar';
 import { Footer } from './client/Footer';
@@ -11,6 +11,7 @@ import { CartDrawer } from './client/CartDrawer';
 import { CheckoutModal } from './client/CheckoutModal';
 import { AuthModal } from './client/AuthModal';
 import { OrderConfirmation } from './client/OrderConfirmation';
+import { Journey } from './client/Journey';
 import { Lock } from 'lucide-react';
 
 interface ClientViewProps {
@@ -25,13 +26,15 @@ interface ClientViewProps {
   notifications: Notification[];
   isLoggedIn: boolean;
   onLogin: (email: string, name?: string, address?: string, phone?: string, country?: string, countryCode?: string) => void;
+  onLogout: () => void;
   onPlaceOrder: (items: CartItem[], specialRequest: string) => void;
   onSubmitReview: (productId: string, comment: string, rating: number) => void;
   onDeleteAccount: () => void;
+  journeyData: JourneySection;
 }
 
 export const ClientView: React.FC<ClientViewProps> = ({ 
-    products, reviews, settings, currentUser, cart, addToCart, updateUser, onNavigate, notifications, isLoggedIn, onLogin, onPlaceOrder, onSubmitReview, onDeleteAccount
+    products, reviews, settings, currentUser, cart, addToCart, updateUser, onNavigate, notifications, isLoggedIn, onLogin, onLogout, onPlaceOrder, onSubmitReview, onDeleteAccount, journeyData
 }) => {
   const [view, setView] = useState<ViewState>(ViewState.LANDING);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -106,7 +109,7 @@ export const ClientView: React.FC<ClientViewProps> = ({
           if (result.success) {
             // Switch to login after successful registration
             setAuthMode('LOGIN');
-            setAuthError('Account created! Please log in.');
+            setAuthError('✓ Account created successfully! Please log in.');
           } else {
             setAuthError(result.message || 'Registration failed');
           }
@@ -277,6 +280,16 @@ export const ClientView: React.FC<ClientViewProps> = ({
             onNavigate={onNavigate}
             notifications={notifications}
             onDeleteAccount={onDeleteAccount}
+            onLogout={onLogout}
+          />
+        )}
+
+        {view === ViewState.JOURNEY && (
+          <Journey
+            styles={journeyData.styles}
+            tools={journeyData.tools}
+            resources={journeyData.resources}
+            stores={journeyData.stores}
           />
         )}
       </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Product, AdminSettings, Order, Notification, Review } from './src/types/types';
+import { Product, AdminSettings, Order, Notification, Review, JourneySection } from './src/types/types';
 import { api } from './src/services/api';
 import { AdminView } from './src/components/AdminView';
 import { YarnLogo, FadeIn } from './src/components/Visuals';
@@ -13,6 +13,12 @@ const Admin: React.FC = () => {
   });
   const [orders, setOrders] = useState<Order[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [journeyData, setJourneyData] = useState<JourneySection>({
+    styles: [],
+    tools: [],
+    resources: [],
+    stores: []
+  });
   
   const [isAdmin, setIsAdmin] = useState(false);
   const [adminLoginError, setAdminLoginError] = useState<string | null>(null);
@@ -164,6 +170,8 @@ const Admin: React.FC = () => {
       updateOrder={updateOrderStatus}
       notifications={notifications.filter(n => n.recipientId === 'admin')}
       onLogout={() => setIsAdmin(false)}
+      journeyData={journeyData}
+      setJourneyData={setJourneyData}
     />
   );
 };

@@ -77,6 +77,7 @@ export const NavBar: React.FC<NavBarProps> = ({
       </div>
 
       <div className="flex items-center gap-6">
+        <button onClick={() => setView(ViewState.JOURNEY)} className={`text-purple-900 font-semibold hover:text-pink-600 transition ${view === ViewState.JOURNEY ? 'text-pink-600' : ''}`}>Journey</button>
         <button onClick={() => setView(ViewState.SHOP)} className={`text-purple-900 font-semibold hover:text-pink-600 transition ${view === ViewState.SHOP ? 'text-pink-600' : ''}`}>Collections</button>
         <div className="flex items-center gap-4 border-l border-pink-200 pl-6 relative">
           {/* Notifications */}

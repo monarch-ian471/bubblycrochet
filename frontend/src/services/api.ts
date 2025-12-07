@@ -327,8 +327,8 @@ export const api = {
 
 export const INITIAL_USER: UserProfile = {
   name: 'Guest User',
-  bio: 'I love finding unique handmade items.',
-  interests: ['Blankets', 'Scarves'],
+  bio: '',
+  interests: [],
   avatar: 'https://picsum.photos/200/200?random=50',
   email: 'guest@example.com'
 };

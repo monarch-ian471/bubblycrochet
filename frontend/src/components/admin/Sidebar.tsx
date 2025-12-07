@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { LayoutDashboard, Package, Settings, ShoppingCart, Bell } from 'lucide-react';
+import { LayoutDashboard, Package, Settings, ShoppingCart, Bell, Compass } from 'lucide-react';
 import { Notification } from '../../types/types';
 
 interface SidebarProps {
-  activeTab: 'DASHBOARD' | 'PRODUCTS' | 'ORDERS' | 'SETTINGS';
-  setActiveTab: (tab: 'DASHBOARD' | 'PRODUCTS' | 'ORDERS' | 'SETTINGS') => void;
+  activeTab: 'DASHBOARD' | 'PRODUCTS' | 'ORDERS' | 'SETTINGS' | 'JOURNEY';
+  setActiveTab: (tab: 'DASHBOARD' | 'PRODUCTS' | 'ORDERS' | 'SETTINGS' | 'JOURNEY') => void;
   onLogout: () => void;
   unreadOrdersCount: number;
   logoUrl?: string;
@@ -77,6 +77,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, onLog
           {unreadOrdersCount > 0 && <span className="absolute -top-2 -right-2 bg-red-500 w-2 h-2 rounded-full"></span>}
         </div> 
         <span>Orders</span>
+      </button>
+      <button 
+        onClick={() => setActiveTab('JOURNEY')}
+        className={`w-full flex items-center space-x-3 p-3 rounded-xl transition ${activeTab === 'JOURNEY' ? 'bg-purple-50 text-purple-700 font-semibold' : 'text-gray-500 hover:bg-gray-50'}`}
+      >
+        <Compass size={20} /> <span>Journey</span>
       </button>
       <button 
         onClick={() => setActiveTab('SETTINGS')}

@@ -9,6 +9,7 @@ interface ProfileProps {
   onNavigate: (view: ViewState) => void;
   notifications: Notification[];
   onDeleteAccount: () => void;
+  onLogout: () => void;
 }
 
 // Comprehensive country list
@@ -171,10 +172,10 @@ const COUNTRY_CODES = [
   { code: '+998', label: '+998 (UZ)' }
 ];
 
-export const Profile: React.FC<ProfileProps> = ({ currentUser, updateUser, onNavigate, notifications, onDeleteAccount }) => {
+export const Profile: React.FC<ProfileProps> = ({ currentUser, updateUser, onNavigate, notifications, onDeleteAccount, onLogout }) => {
   const [newInterest, setNewInterest] = useState('');
   const [showInterestInput, setShowInterestInput] = useState(false);
-  const [bio, setBio] = useState(currentUser.bio);
+  const [bio, setBio] = useState(currentUser.bio || '');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showPasswordSection, setShowPasswordSection] = useState(false);
   const [passwordData, setPasswordData] = useState({
@@ -259,7 +260,7 @@ export const Profile: React.FC<ProfileProps> = ({ currentUser, updateUser, onNav
         <p className="text-gray-500 text-center text-sm">{currentUser.email}</p>
         
         <button 
-          onClick={() => onNavigate(ViewState.LOGIN)} 
+          onClick={onLogout} 
           className="flex items-center gap-2 text-red-500 font-semibold hover:bg-red-50 px-6 py-2 rounded-lg transition mt-4"
         >
           <LogIn size={20} /> Sign Out
@@ -393,21 +394,6 @@ export const Profile: React.FC<ProfileProps> = ({ currentUser, updateUser, onNav
             <p className="text-blue-600 text-sm">No recent orders found. Time to browse our collection!</p>
           )}
         </div>
-        
-        {/* Delete Account Section */}
-        <div className="bg-red-50 p-6 rounded-xl border border-red-200">
-          <h3 className="font-bold text-red-800 mb-2">Delete Account</h3>
-          <p className="text-red-600 text-sm mb-4">
-            Permanently delete your account and all associated data. This action cannot be undone.
-          </p>
-          <button
-            onClick={() => setShowDeleteConfirm(true)}
-            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition font-semibold"
-          >
-            <Trash2 size={16} />
-            Delete My Account
-          </button>
-        </div>
 
         {/* Password Change Section */}
         <div className="bg-purple-50 p-6 rounded-xl border border-purple-200">
@@ -500,6 +486,21 @@ export const Profile: React.FC<ProfileProps> = ({ currentUser, updateUser, onNav
               </div>
             </form>
           )}
+        </div>
+        
+        {/* Delete Account Section */}
+        <div className="bg-red-50 p-6 rounded-xl border border-red-200">
+          <h3 className="font-bold text-red-800 mb-2">Delete Account</h3>
+          <p className="text-red-600 text-sm mb-4">
+            Permanently delete your account and all associated data. This action cannot be undone.
+          </p>
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition font-semibold"
+          >
+            <Trash2 size={16} />
+            Delete My Account
+          </button>
         </div>
       </div>
     </div>

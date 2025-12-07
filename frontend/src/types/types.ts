@@ -77,6 +77,23 @@ export interface AdminSettings {
   youtubeUrl?: string;
 }
 
+export interface JourneyResource {
+  id: string;
+  title: string;
+  description: string;
+  url: string;
+  thumbnailUrl: string;
+  category: 'styles' | 'tools' | 'resources' | 'stores';
+  createdAt: number;
+}
+
+export interface JourneySection {
+  styles: JourneyResource[];
+  tools: JourneyResource[];
+  resources: JourneyResource[];
+  stores: JourneyResource[];
+}
+
 export enum ViewState {
   LANDING = 'LANDING',
   SHOP = 'SHOP',
@@ -85,6 +102,7 @@ export enum ViewState {
   PROFILE = 'PROFILE',
   LOGIN = 'LOGIN',
   ORDER_CONFIRMATION = 'ORDER_CONFIRMATION',
+  JOURNEY = 'JOURNEY',
   ADMIN_DASHBOARD = 'ADMIN_DASHBOARD',
   ADMIN_PRODUCTS = 'ADMIN_PRODUCTS',
   ADMIN_ORDERS = 'ADMIN_ORDERS',

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Product, AdminSettings, Order, Notification } from '../types/types';
+import { Product, AdminSettings, Order, Notification, JourneySection, JourneyResource } from '../types/types';
 import { Sidebar } from './admin/Sidebar';
 import { Dashboard } from './admin/Dashboard';
 import { ProductsManagement } from './admin/ProductsManagement';
 import { OrdersManagement } from './admin/OrdersManagement';
 import { SettingsManagement } from './admin/SettingsManagement';
+import { JourneyManagement } from './admin/JourneyManagement';
 import { api } from '../services/api';
 import { Check, AlertCircle } from 'lucide-react';
 
@@ -17,12 +18,14 @@ interface AdminViewProps {
   updateOrder: (orderId: string, status: Order['status']) => void;
   notifications: Notification[];
   onLogout: () => void;
+  journeyData: JourneySection;
+  setJourneyData: React.Dispatch<React.SetStateAction<JourneySection>>;
 }
 
 export const AdminView: React.FC<AdminViewProps> = ({ 
-    products, setProducts, settings, setSettings, orders, updateOrder, notifications, onLogout 
+    products, setProducts, settings, setSettings, orders, updateOrder, notifications, onLogout, journeyData, setJourneyData
 }) => {
-  const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'PRODUCTS' | 'ORDERS' | 'SETTINGS'>('DASHBOARD');
+  const [activeTab, setActiveTab] = useState<'DASHBOARD' | 'PRODUCTS' | 'ORDERS' | 'SETTINGS' | 'JOURNEY'>('DASHBOARD');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
@@ -92,6 +95,32 @@ export const AdminView: React.FC<AdminViewProps> = ({
     }
   };
 
+  const handleSaveJourneyResource = (resource: JourneyResource) => {
+    setJourneyData(prev => {
+      const category = resource.category;
+      const existingIndex = prev[category].findIndex(r => r.id === resource.id);
+      
+      if (existingIndex >= 0) {
+        // Update existing
+        const updated = [...prev[category]];
+        updated[existingIndex] = resource;
+        return { ...prev, [category]: updated };
+      } else {
+        // Add new
+        return { ...prev, [category]: [...prev[category], resource] };
+      }
+    });
+    showToast('Journey resource saved successfully', 'success');
+  };
+
+  const handleDeleteJourneyResource = (id: string, category: string) => {
+    setJourneyData(prev => ({
+      ...prev,
+      [category]: prev[category as keyof JourneySection].filter(r => r.id !== id)
+    }));
+    showToast('Journey resource deleted successfully', 'success');
+  };
+
   return (
     <>
       {toast && (
@@ -141,6 +170,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
             settings={settings}
             setSettings={setSettings}
             onSave={handleSaveSettings}
+          />
+        )}
+        {activeTab === 'JOURNEY' && (
+          <JourneyManagement
+            journeyData={journeyData}
+            onSaveResource={handleSaveJourneyResource}
+            onDeleteResource={handleDeleteJourneyResource}
           />
         )}
       </main>
