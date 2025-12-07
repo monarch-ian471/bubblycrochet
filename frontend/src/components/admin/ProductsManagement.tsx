@@ -111,6 +111,13 @@ export const ProductsManagement: React.FC<ProductsManagementProps> = ({
               <label className="block text-sm font-medium text-gray-700">Production Time (Days)</label>
               <input name="daysToMake" type="number" defaultValue={editingProduct.daysToMake || 3} className="w-full mt-1 p-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none text-gray-900" />
             </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Stock Status</label>
+              <select name="inStock" defaultValue={editingProduct.inStock ? 'true' : 'false'} className="w-full mt-1 p-2 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none text-gray-900">
+                <option value="true">In Stock</option>
+                <option value="false">Out of Stock</option>
+              </select>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">Description</label>

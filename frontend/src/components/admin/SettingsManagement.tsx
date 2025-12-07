@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Edit2, Instagram, Youtube, Check } from 'lucide-react';
+import { Edit2, Instagram, Youtube, Check, Lock, AlertCircle } from 'lucide-react';
 import { AdminSettings } from '../../types/types';
+import { api } from '../../services/api';
 
 interface SettingsManagementProps {
   settings: AdminSettings;
@@ -10,6 +11,14 @@ interface SettingsManagementProps {
 
 export const SettingsManagement: React.FC<SettingsManagementProps> = ({ settings, setSettings, onSave }) => {
   const [showToast, setShowToast] = useState(false);
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
+  });
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
 
   const handleSaveChanges = () => {
     // Show toast notification
@@ -19,6 +28,38 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ settings
     // Call parent's save handler if provided
     if (onSave) {
       onSave();
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError('');
+    setPasswordSuccess('');
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError('New passwords do not match');
+      return;
+    }
+
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      return;
+    }
+
+    try {
+      const result = await api.auth.changePassword(passwordData.currentPassword, passwordData.newPassword);
+      if (result.success) {
+        setPasswordSuccess('Password changed successfully!');
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+        setTimeout(() => {
+          setPasswordSuccess('');
+          setShowPasswordSection(false);
+        }, 2000);
+      } else {
+        setPasswordError(result.message || 'Failed to change password');
+      }
+    } catch (error) {
+      setPasswordError('Failed to change password');
     }
   };
 
@@ -108,6 +149,99 @@ export const SettingsManagement: React.FC<SettingsManagementProps> = ({ settings
           Save Changes
         </button>
       </div>
+    </div>
+
+    {/* Password Change Section */}
+    <div className="bg-white p-8 rounded-xl shadow-sm border border-pink-100 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-bold text-lg text-gray-800 flex items-center gap-2">
+            <Lock size={20} className="text-purple-600" />
+            Security Settings
+          </h3>
+          <p className="text-sm text-gray-500">Update your password</p>
+        </div>
+        {!showPasswordSection && (
+          <button
+            onClick={() => setShowPasswordSection(true)}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-semibold"
+          >
+            Change Password
+          </button>
+        )}
+      </div>
+
+      {showPasswordSection && (
+        <form onSubmit={handlePasswordChange} className="space-y-4 pt-4 border-t border-purple-100">
+          {passwordError && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-lg flex items-center text-sm">
+              <AlertCircle size={16} className="mr-2" />
+              {passwordError}
+            </div>
+          )}
+          {passwordSuccess && (
+            <div className="bg-green-50 text-green-600 p-3 rounded-lg flex items-center text-sm">
+              <Check size={16} className="mr-2" />
+              {passwordSuccess}
+            </div>
+          )}
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Current Password</label>
+            <input
+              type="password"
+              value={passwordData.currentPassword}
+              onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+              required
+              className="w-full mt-1 p-3 border border-purple-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-purple-500"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700">New Password</label>
+            <input
+              type="password"
+              value={passwordData.newPassword}
+              onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+              required
+              minLength={6}
+              className="w-full mt-1 p-3 border border-purple-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-purple-500"
+            />
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
+            <input
+              type="password"
+              value={passwordData.confirmPassword}
+              onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+              required
+              minLength={6}
+              className="w-full mt-1 p-3 border border-purple-200 rounded-lg text-gray-900 focus:ring-2 focus:ring-purple-500"
+            />
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                setShowPasswordSection(false);
+                setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                setPasswordError('');
+              }}
+              className="flex-1 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 font-semibold"
+            >
+              Update Password
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   </div>
   </>

@@ -52,13 +52,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
     const formData = new FormData(e.currentTarget);
     
     const newProduct: Product = {
-      id: editingProduct ? editingProduct.id : Date.now().toString(),
+      id: editingProduct?.id || '',
       name: formData.get('name') as string,
       description: formData.get('description') as string,
       price: parseFloat(formData.get('price') as string),
       category: formData.get('category') as string,
       images: [formData.get('imageUrl') as string || 'https://picsum.photos/600/600'],
-      inStock: true,
+      inStock: formData.get('inStock') === 'true',
       createdAt: editingProduct ? editingProduct.createdAt : Date.now(),
       discount: parseFloat(formData.get('discount') as string) || 0,
       daysToMake: parseInt(formData.get('daysToMake') as string) || 3,
@@ -66,13 +66,13 @@ export const AdminView: React.FC<AdminViewProps> = ({
     };
 
     try {
-      await api.saveProduct(newProduct);
+      const savedProduct = await api.saveProduct(newProduct);
       
-      if (editingProduct) {
-        setProducts(prev => prev.map(p => p.id === editingProduct.id ? newProduct : p));
+      if (editingProduct?.id) {
+        setProducts(prev => prev.map(p => p.id === editingProduct.id ? savedProduct : p));
         showToast('Product updated successfully', 'success');
       } else {
-        setProducts(prev => [newProduct, ...prev]);
+        setProducts(prev => [savedProduct, ...prev]);
         showToast('Product added successfully', 'success');
       }
       setEditingProduct(null);

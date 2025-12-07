@@ -75,18 +75,13 @@ export const ClientView: React.FC<ClientViewProps> = ({
       }
   };
 
-  const handleAuthSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleAuthSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setAuthError(null);
 
       const formData = new FormData(e.currentTarget);
       const email = formData.get('email') as string;
       const password = formData.get('password') as string;
-      const name = formData.get('name') as string;
-      const address = formData.get('address') as string;
-      const phone = formData.get('phone') as string;
-      const country = formData.get('country') as string;
-      const countryCode = formData.get('countryCode') as string;
 
       // Validate Input using API utility
       const validationError = api.auth.validateClientPayload(email, password);
@@ -95,19 +90,43 @@ export const ClientView: React.FC<ClientViewProps> = ({
           return;
       }
 
-      // If signup mode, switch to login mode instead of logging in directly
-      if (authMode === 'SIGNUP') {
-          // Show success message and switch to login
-          setAuthMode('LOGIN');
-          setAuthError(null);
-          // In production, this would create the account via API
-          // For now, just prompt them to login with the account they "created"
-          return;
-      }
+      try {
+        if (authMode === 'SIGNUP') {
+          // Call real registration API
+          const name = formData.get('name') as string;
+          const address = formData.get('address') as string;
+          const country = formData.get('country') as string;
+          const countryCode = formData.get('countryCode') as string;
+          const phone = formData.get('phone') as string;
 
-      // If login mode, proceed to login
-      onLogin(email, name, address, phone, country, countryCode);
-      setShowAuthModal(false);
+          const result = await api.auth.register({
+            email, password, name, address, country, countryCode, phone
+          });
+
+          if (result.success) {
+            // Switch to login after successful registration
+            setAuthMode('LOGIN');
+            setAuthError('Account created! Please log in.');
+          } else {
+            setAuthError(result.message || 'Registration failed');
+          }
+          return;
+        }
+
+        // Login mode - call real login API
+        const result = await api.auth.loginClient(email, password);
+        onLogin(
+          result.user.email, 
+          result.user.name, 
+          result.user.address, 
+          result.user.phone,
+          result.user.country,
+          result.user.countryCode
+        );
+        setShowAuthModal(false);
+      } catch (error: any) {
+        setAuthError(error.message);
+      }
   };
 
   return (

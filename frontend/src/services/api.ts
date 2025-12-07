@@ -99,6 +99,48 @@ let NOTIFICATIONS_DB: Notification[] = [];
 export const api = {
   // --- AUTHENTICATION & VALIDATION ---
   auth: {
+    // Client Registration
+    register: async (userData: {
+      email: string;
+      password: string;
+      name: string;
+      address: string;
+      country: string;
+      countryCode: string;
+      phone: string;
+    }): Promise<{ success: boolean; message?: string }> => {
+      try {
+        const response = await axios.post(`${API_BASE_URL}/auth/register`, userData);
+        if (response.data.success) {
+          return { success: true };
+        }
+        return { success: false, message: 'Registration failed' };
+      } catch (error: any) {
+        return { 
+          success: false, 
+          message: error.response?.data?.message || 'Registration failed' 
+        };
+      }
+    },
+
+    // Client Login
+    loginClient: async (email: string, password: string): Promise<{ token: string; user: any }> => {
+      try {
+        const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+          email,
+          password
+        });
+        
+        if (response.data.success && response.data.token) {
+          localStorage.setItem('token', response.data.token);
+          return response.data;
+        }
+        throw new Error('Login failed');
+      } catch (error: any) {
+        throw new Error(error.response?.data?.message || 'Invalid credentials');
+      }
+    },
+
     // Admin Login
     loginAdmin: async (email: string, password: string): Promise<boolean> => {
       try {
@@ -127,27 +169,82 @@ export const api = {
          return "Password must be at least 6 characters long.";
        }
        return null; // No error
+    },
+
+    // Change Password
+    changePassword: async (currentPassword: string, newPassword: string): Promise<{ success: boolean; message?: string }> => {
+      try {
+        const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+        const response = await axios.put(`${API_BASE_URL}/auth/change-password`, 
+          { currentPassword, newPassword },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        return { success: true };
+      } catch (error: any) {
+        return { 
+          success: false, 
+          message: error.response?.data?.message || 'Failed to change password' 
+        };
+      }
+    },
+
+    // Reset Password Request
+    requestPasswordReset: async (email: string): Promise<{ success: boolean; message?: string }> => {
+      try {
+        const response = await axios.post(`${API_BASE_URL}/auth/reset-password-request`, { email });
+        return { success: true, message: response.data.message };
+      } catch (error: any) {
+        return { 
+          success: false, 
+          message: error.response?.data?.message || 'Failed to send reset email' 
+        };
+      }
     }
   },
 
   // Products
   getProducts: async (): Promise<Product[]> => {
-    // MongoDB: return await axios.get('/api/products');
-    return new Promise((resolve) => setTimeout(() => resolve([...PRODUCTS_DB]), 300));
+    try {
+      const response = await axios.get(`${API_BASE_URL}/products`);
+      return response.data.products || [];
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+      return [];
+    }
   },
   saveProduct: async (product: Product): Promise<Product> => {
-    // MongoDB: return await axios.post('/api/products', product);
-    const index = PRODUCTS_DB.findIndex(p => p.id === product.id);
-    if (index >= 0) {
-      PRODUCTS_DB[index] = product;
+    const token = localStorage.getItem('adminToken');
+    const productData = {
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      category: product.category,
+      images: product.images,
+      inStock: product.inStock,
+      discount: product.discount,
+      daysToMake: product.daysToMake,
+      shippingCost: product.shippingCost
+    };
+    
+    if (product.id && product.id !== '') {
+      // Update existing product
+      const response = await axios.put(`${API_BASE_URL}/products/${product.id}`, productData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data.product;
     } else {
-      PRODUCTS_DB.unshift(product);
+      // Create new product
+      const response = await axios.post(`${API_BASE_URL}/products`, productData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data.product;
     }
-    return Promise.resolve(product);
   },
   deleteProduct: async (id: string): Promise<void> => {
-     PRODUCTS_DB = PRODUCTS_DB.filter(p => p.id !== id);
-     return Promise.resolve();
+    const token = localStorage.getItem('adminToken');
+    await axios.delete(`${API_BASE_URL}/products/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
   },
 
   // Reviews
@@ -162,16 +259,29 @@ export const api = {
 
   // Orders
   getOrders: async (): Promise<Order[]> => {
-    return Promise.resolve([...ORDERS_DB]);
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await axios.get(`${API_BASE_URL}/orders`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return response.data.orders || [];
+    } catch (error) {
+      console.error('Failed to fetch orders:', error);
+      return [];
+    }
   },
   createOrder: async (order: Order): Promise<Order> => {
-    ORDERS_DB.unshift(order);
-    return Promise.resolve(order);
+    const token = localStorage.getItem('token');
+    const response = await axios.post(`${API_BASE_URL}/orders`, order, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    return response.data.order;
   },
   updateOrderStatus: async (id: string, status: Order['status']): Promise<void> => {
-    const order = ORDERS_DB.find(o => o.id === id);
-    if (order) order.status = status;
-    return Promise.resolve();
+    const token = localStorage.getItem('adminToken');
+    await axios.put(`${API_BASE_URL}/orders/${id}/status`, { status }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
   },
 
   // Settings

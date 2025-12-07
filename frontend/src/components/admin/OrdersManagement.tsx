@@ -32,8 +32,8 @@ export const OrdersManagement: React.FC<OrdersManagementProps> = ({ orders, upda
               </div>
               <div className="bg-gray-50 p-4 rounded-lg mb-4">
                 <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">Items</h4>
-                {order.items.map(item => (
-                  <div key={item.id} className="flex justify-between text-sm mb-1">
+                {order.items.map((item, idx) => (
+                  <div key={`${item.id || item.name}-${idx}`} className="flex justify-between text-sm mb-1">
                     <span>{item.quantity}x {item.name}</span>
                     <span>${(item.price * item.quantity).toFixed(2)}</span>
                   </div>
