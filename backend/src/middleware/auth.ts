@@ -39,3 +39,6 @@ export const admin = (req: AuthRequest, res: Response, next: NextFunction) => {
     res.status(403).json({ message: 'Not authorized as admin' });
   }
 };
+
+// Alias for consistency
+export const adminOnly = admin;

@@ -38,6 +38,14 @@ export const register = async (req: Request, res: Response) => {
 
     const token = generateToken(user._id.toString());
 
+    // Set httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
     res.status(201).json({
       success: true,
       token,
@@ -78,6 +86,14 @@ export const login = async (req: Request, res: Response) => {
     }
 
     const token = generateToken(user._id.toString());
+
+    // Set httpOnly cookie
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
 
     res.json({
       success: true,
@@ -133,6 +149,14 @@ export const adminLogin = async (req: Request, res: Response) => {
     }
 
     const token = generateToken(user._id.toString());
+
+    // Set httpOnly cookie
+    res.cookie('adminToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
 
     res.json({
       success: true,
@@ -245,6 +269,31 @@ export const requestPasswordReset = async (req: Request, res: Response) => {
     res.json({
       success: true,
       message: 'If an account exists with this email, a password reset link has been sent.'
+    });
+  } catch (error: any) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Logout user
+// @route   POST /api/auth/logout
+// @access  Public
+export const logout = async (req: Request, res: Response) => {
+  try {
+    // Clear cookies
+    res.cookie('token', '', {
+      httpOnly: true,
+      expires: new Date(0)
+    });
+    
+    res.cookie('adminToken', '', {
+      httpOnly: true,
+      expires: new Date(0)
+    });
+
+    res.json({
+      success: true,
+      message: 'Logged out successfully'
     });
   } catch (error: any) {
     res.status(500).json({ message: error.message });

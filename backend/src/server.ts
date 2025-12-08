@@ -1,10 +1,21 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import cookieParser from 'cookie-parser';
+import NodeCache from 'node-cache';
 import { connectDB } from './config/database';
 
 // Load env vars
 dotenv.config();
+
+// Initialize cache (TTL: 10 minutes, check period: 2 minutes)
+const cache = new NodeCache({ stdTTL: 600, checkperiod: 120 });
+
+// Make cache available globally
+declare global {
+  var appCache: NodeCache;
+}
+global.appCache = cache;
 
 // Import routes
 import authRoutes from './routes/authRoutes';
@@ -12,6 +23,7 @@ import productRoutes from './routes/productRoutes';
 import orderRoutes from './routes/orderRoutes';
 import reviewRoutes from './routes/reviewRoutes';
 import settingsRoutes from './routes/settingsRoutes';
+import journeyRoutes from './routes/journeyRoutes';
 
 // Initialize app
 const app: Application = express();
@@ -27,6 +39,7 @@ app.use(cors({
   ],
   credentials: true
 }));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -36,6 +49,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/journey', journeyRoutes);
 
 // Health check
 app.get('/api/health', (req: Request, res: Response) => {

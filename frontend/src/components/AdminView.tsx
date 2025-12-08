@@ -95,30 +95,59 @@ export const AdminView: React.FC<AdminViewProps> = ({
     }
   };
 
-  const handleSaveJourneyResource = (resource: JourneyResource) => {
-    setJourneyData(prev => {
-      const category = resource.category;
-      const existingIndex = prev[category].findIndex(r => r.id === resource.id);
-      
-      if (existingIndex >= 0) {
-        // Update existing
-        const updated = [...prev[category]];
-        updated[existingIndex] = resource;
-        return { ...prev, [category]: updated };
-      } else {
-        // Add new
-        return { ...prev, [category]: [...prev[category], resource] };
+  const handleSaveJourneyResource = async (resource: JourneyResource) => {
+    try {
+      if (resource.id && resource.id.startsWith('journey_')) {
+        // New resource - create
+        const created = await api.createJourneyResource({
+          title: resource.title,
+          description: resource.description,
+          url: resource.url,
+          thumbnailUrl: resource.thumbnailUrl,
+          category: resource.category
+        });
+        
+        setJourneyData(prev => ({
+          ...prev,
+          [resource.category]: [...prev[resource.category], created]
+        }));
+      } else if (resource.id) {
+        // Existing resource - update
+        const updated = await api.updateJourneyResource(resource.id, {
+          title: resource.title,
+          description: resource.description,
+          url: resource.url,
+          thumbnailUrl: resource.thumbnailUrl,
+          category: resource.category
+        });
+        
+        setJourneyData(prev => {
+          const category = resource.category;
+          return {
+            ...prev,
+            [category]: prev[category].map(r => r.id === resource.id ? updated : r)
+          };
+        });
       }
-    });
-    showToast('Journey resource saved successfully', 'success');
+      showToast('Journey resource saved successfully', 'success');
+    } catch (error: any) {
+      showToast(error.message || 'Failed to save journey resource', 'error');
+      console.error(error);
+    }
   };
 
-  const handleDeleteJourneyResource = (id: string, category: string) => {
-    setJourneyData(prev => ({
-      ...prev,
-      [category]: prev[category as keyof JourneySection].filter(r => r.id !== id)
-    }));
-    showToast('Journey resource deleted successfully', 'success');
+  const handleDeleteJourneyResource = async (id: string, category: string) => {
+    try {
+      await api.deleteJourneyResource(id);
+      setJourneyData(prev => ({
+        ...prev,
+        [category]: prev[category as keyof JourneySection].filter(r => r.id !== id)
+      }));
+      showToast('Journey resource deleted successfully', 'success');
+    } catch (error: any) {
+      showToast(error.message || 'Failed to delete journey resource', 'error');
+      console.error(error);
+    }
   };
 
   return (

@@ -1,4 +1,4 @@
-import { Product, Review, AdminSettings, UserProfile, Order, Notification } from '../types/types';
+import { Product, Review, AdminSettings, UserProfile, Order, Notification, JourneyResource } from '../types/types';
 import axios from 'axios';
 
 const API_BASE_URL = 'http://localhost:5000/api';
@@ -321,6 +321,52 @@ export const api = {
       NOTIFICATIONS_DB = NOTIFICATIONS_DB.filter(n => n.recipientId !== email);
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Failed to delete account');
+    }
+  },
+
+  // Journey Resources
+  getJourneyResources: async (): Promise<{ styles: JourneyResource[]; tools: JourneyResource[]; resources: JourneyResource[]; stores: JourneyResource[] }> => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/journey/grouped`);
+      return response.data.data;
+    } catch (error: any) {
+      console.error('Failed to fetch journey resources:', error);
+      return { styles: [], tools: [], resources: [], stores: [] };
+    }
+  },
+
+  createJourneyResource: async (resource: Omit<JourneyResource, 'id' | 'createdAt'>): Promise<JourneyResource> => {
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      const response = await axios.post(`${API_BASE_URL}/journey`, resource, {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to create journey resource');
+    }
+  },
+
+  updateJourneyResource: async (id: string, resource: Partial<JourneyResource>): Promise<JourneyResource> => {
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      const response = await axios.put(`${API_BASE_URL}/journey/${id}`, resource, {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+      return response.data.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to update journey resource');
+    }
+  },
+
+  deleteJourneyResource: async (id: string): Promise<void> => {
+    try {
+      const adminToken = localStorage.getItem('adminToken');
+      await axios.delete(`${API_BASE_URL}/journey/${id}`, {
+        headers: { Authorization: `Bearer ${adminToken}` }
+      });
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Failed to delete journey resource');
     }
   }
 };

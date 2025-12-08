@@ -78,6 +78,11 @@ export const ClientView: React.FC<ClientViewProps> = ({
       }
   };
 
+  const handleLogout = () => {
+      onLogout();
+      setView(ViewState.LANDING);
+  };
+
   const handleAuthSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
       setAuthError(null);
@@ -280,7 +285,7 @@ export const ClientView: React.FC<ClientViewProps> = ({
             onNavigate={onNavigate}
             notifications={notifications}
             onDeleteAccount={onDeleteAccount}
-            onLogout={onLogout}
+            onLogout={handleLogout}
           />
         )}
 

@@ -56,18 +56,20 @@ const App: React.FC = () => {
   // --- Initial Data Load ---
   useEffect(() => {
     const loadData = async () => {
-        const [p, r, s, o, n] = await Promise.all([
+        const [p, r, s, o, n, j] = await Promise.all([
             api.getProducts(),
             api.getReviews(),
             api.getSettings(),
             api.getOrders(),
-            api.getNotifications()
+            api.getNotifications(),
+            api.getJourneyResources()
         ]);
         setProducts(p);
         setReviews(r);
         setSettings(s);
         setOrders(o);
         setNotifications(n);
+        setJourneyData(j);
     };
     loadData();
   }, []);

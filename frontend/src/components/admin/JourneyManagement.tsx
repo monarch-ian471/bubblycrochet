@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Edit2, Trash2, ExternalLink, Save, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, ExternalLink, Save, X, Upload } from 'lucide-react';
 import { JourneyResource } from '../../types/types';
 
 interface JourneyManagementProps {
@@ -27,6 +27,10 @@ export const JourneyManagement: React.FC<JourneyManagementProps> = ({
     url: '',
     thumbnailUrl: ''
   });
+
+  const [passwordError, setPasswordError] = useState('');
+  const [passwordSuccess, setPasswordSuccess] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
 
   const categories = [
     { id: 'styles', label: 'Crochet Styles & Patterns' },
@@ -89,6 +93,58 @@ export const JourneyManagement: React.FC<JourneyManagementProps> = ({
   const handleDelete = (id: string) => {
     if (window.confirm('Are you sure you want to delete this resource?')) {
       onDeleteResource(id, selectedCategory);
+    }
+  };
+
+  // Drag and drop handlers
+  const handleDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    const imageFile = files.find((file: File) => file.type.startsWith('image/'));
+
+    if (imageFile) {
+      // Convert to base64 or upload to a service
+      // For demo purposes, we'll use a FileReader to create a data URL
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        setFormData({ ...formData, thumbnailUrl: dataUrl });
+      };
+      reader.readAsDataURL(imageFile as Blob);
+    } else {
+      alert('Please drop an image file');
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        setFormData({ ...formData, thumbnailUrl: dataUrl });
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -182,17 +238,52 @@ export const JourneyManagement: React.FC<JourneyManagementProps> = ({
 
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Thumbnail URL
+                Thumbnail Image
               </label>
+              
+              {/* Drag and Drop Area */}
+              <div
+                onDragEnter={handleDragEnter}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                className={`relative border-2 border-dashed rounded-xl p-8 transition-all ${
+                  isDragging
+                    ? 'border-purple-500 bg-purple-50'
+                    : 'border-gray-300 bg-gray-50 hover:border-purple-400'
+                }`}
+              >
+                <div className="text-center">
+                  <Upload className={`mx-auto mb-4 ${isDragging ? 'text-purple-600' : 'text-gray-400'}`} size={48} />
+                  <p className="text-gray-600 mb-2">
+                    {isDragging ? 'Drop image here' : 'Drag and drop an image here'}
+                  </p>
+                  <p className="text-sm text-gray-400 mb-4">or</p>
+                  <label className="inline-block bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 cursor-pointer transition">
+                    Browse Files
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                    />
+                  </label>
+                  <p className="text-xs text-gray-400 mt-3">or paste an image URL below</p>
+                </div>
+              </div>
+
+              {/* URL Input Alternative */}
               <input
                 type="url"
                 value={formData.thumbnailUrl}
                 onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 mt-3"
                 placeholder="https://example.com/image.jpg"
               />
+
               {formData.thumbnailUrl && (
                 <div className="mt-3">
+                  <p className="text-sm text-gray-600 mb-2">Preview:</p>
                   <img
                     src={formData.thumbnailUrl}
                     alt="Preview"
