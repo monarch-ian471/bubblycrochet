@@ -6,11 +6,5 @@
       "source": "/api/:path*",
       "destination": "/api/serverless"
     }
-  ],
-  "routes": [
-    {
-      "src": "/admin.html",
-      "dest": "/admin.html"
-    }
   ]
 }
