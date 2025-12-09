@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
   "builds": [
     {
       "src": "backend/src/server.ts",
@@ -7,13 +9,6 @@
       "config": {
         "includeFiles": ["backend/**"],
         "maxLambdaSize": "10mb"
-      }
-    },
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "frontend/dist"
       }
     }
   ],
