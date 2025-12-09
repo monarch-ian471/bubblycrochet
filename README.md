@@ -216,18 +216,23 @@ npm run preview  # Preview production build
 
 ### Backend (.env)
 ```env
-NODE_ENV=development
+NODE_ENV=production
 PORT=5000
-MONGODB_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
+MONGODB_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_super_secret_jwt_key_minimum_32_characters
 JWT_EXPIRE=7d
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=https://your-app.vercel.app
+ADMIN_URL=https://your-app.vercel.app/admin.html
+ALLOWED_ORIGINS=https://your-app.vercel.app
 ```
 
 ### Frontend (.env)
 ```env
-VITE_API_URL=http://localhost:5000/api
+VITE_API_URL=https://your-app.vercel.app/api
+GEMINI_API_KEY=your_gemini_api_key_if_using_ai_features
 ```
+
+**Note**: Never commit `.env` files to Git. Use `.env.example` files as templates.
 
 ## 🧪 Testing
 
@@ -243,19 +248,62 @@ curl http://localhost:5000/api/health
 
 ## 📦 Deployment
 
-### Backend Deployment
-1. Build the TypeScript code: `npm run build`
-2. Set production environment variables
-3. Deploy to your hosting service (Heroku, Railway, DigitalOcean, etc.)
+### Production Deployment to Vercel
 
-### Frontend Deployment
-1. Update `VITE_API_URL` to your production API URL
-2. Build: `npm run build`
-3. Deploy the `dist` folder to:
-   - Vercel
-   - Netlify
-   - AWS S3 + CloudFront
-   - Any static hosting service
+This project is configured for seamless deployment to Vercel. See **[DEPLOYMENT.md](./DEPLOYMENT.md)** for complete deployment guide.
+
+#### Quick Deploy Steps
+
+1. **Prerequisites**
+   - MongoDB Atlas account with cluster set up
+   - Vercel account connected to GitHub
+   - Environment variables prepared
+
+2. **Deploy to Vercel**
+   ```bash
+   # Install Vercel CLI
+   npm i -g vercel
+   
+   # Login and deploy
+   vercel login
+   vercel
+   ```
+
+3. **Configure Environment Variables in Vercel Dashboard**
+   - `MONGODB_URI` - Your MongoDB Atlas connection string
+   - `JWT_SECRET` - Strong secret key (min 32 characters)
+   - `FRONTEND_URL` - Your Vercel app URL
+   - `ADMIN_URL` - Your Vercel app URL/admin.html
+   - `ALLOWED_ORIGINS` - Your Vercel app URL
+   - `VITE_API_URL` - Your Vercel app URL/api
+
+4. **Access Your Application**
+   - Client: `https://your-app.vercel.app`
+   - Admin: `https://your-app.vercel.app/admin.html`
+   - API: `https://your-app.vercel.app/api`
+
+#### Deployment Files
+- `vercel.json` - Vercel configuration
+- `.env.example` - Environment variable template
+- `DEPLOYMENT.md` - Detailed deployment guide
+- `PRODUCTION_CHECKLIST.md` - Pre-deployment checklist
+
+### Alternative Deployment Options
+
+#### Backend
+- Railway
+- Render
+- Heroku
+- DigitalOcean App Platform
+- AWS Elastic Beanstalk
+
+#### Frontend
+- Netlify
+- AWS S3 + CloudFront
+- GitHub Pages
+- Firebase Hosting
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for detailed instructions.
 
 ## 🤝 Contributing
 

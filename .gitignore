@@ -1,3 +1,27 @@
 node_modules
 DATABASE_INTEGRATION_GUIDE.md
 BACKEND_INTEGRATION.md
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# Build outputs
+dist
+build
+.vercel
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+

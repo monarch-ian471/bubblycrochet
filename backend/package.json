@@ -2,11 +2,16 @@
   "name": "bubblycrochet-backend",
   "version": "1.0.0",
   "description": "Backend API for Bubbly Crochet",
-  "main": "src/server.ts",
+  "main": "dist/server.js",
+  "engines": {
+    "node": ">=18.x"
+  },
   "scripts": {
     "dev": "nodemon src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "vercel-build": "npm run build",
+    "create-admin": "ts-node scripts/createAdmin.ts"
   },
   "keywords": [],
   "author": "",

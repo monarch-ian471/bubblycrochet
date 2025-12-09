@@ -1,0 +1,30 @@
+{
+  "name": "bubblycrochet",
+  "version": "1.0.0",
+  "description": "Bubbly Crochet - E-commerce platform for handmade crochet items",
+  "private": true,
+  "engines": {
+    "node": ">=18.x"
+  },
+  "scripts": {
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "build": "npm run build:backend && npm run build:frontend",
+    "vercel-build": "npm run build:frontend"
+  },
+  "keywords": [
+    "ecommerce",
+    "crochet",
+    "handmade",
+    "marketplace"
+  ],
+  "author": "Ian Katengeza",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

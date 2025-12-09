@@ -1,7 +1,9 @@
 import { Product, Review, AdminSettings, UserProfile, Order, Notification, JourneyResource } from '../types/types';
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:5000/api';
+// In production on Vercel, API is on same domain
+const API_BASE_URL = import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD ? '/api' : 'http://localhost:5000/api');
 
 // --- IN-MEMORY DATABASE (Replace these with MongoDB calls in the future) ---
 let PRODUCTS_DB: Product[] = [
